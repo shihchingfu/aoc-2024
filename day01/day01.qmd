@@ -1,0 +1,34 @@
+---
+title: "Day 1"
+format: html
+---
+
+```{r}
+library(readr)
+library(here)
+library(dplyr)
+```
+
+
+## Part 1
+
+```{r}
+read.table(here("day01/input")) |> 
+  mutate(across(everything(), sort)) |> 
+  mutate(delta = abs(V1 - V2)) |> 
+  summarise(sum(delta))
+```
+
+## Part 2
+
+```{r}
+dat <- read.table(here("day01/input")) 
+dat_tally <- table(dat$V2)
+
+scores = rep(0,  NROW(dat))
+for (i in seq_along(dat$V1)) {
+  scores[i] <- dat$V1[i] * dat_tally[as.character(dat$V1[i])]
+}
+sum(scores, na.rm = TRUE)
+```
+
