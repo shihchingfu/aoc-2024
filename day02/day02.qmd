@@ -1,0 +1,74 @@
+---
+title: "Day 2"
+format: html
+---
+
+```{r setup}
+library(readr)
+library(here)
+library(dplyr)
+```
+
+
+## Part 1
+
+```{r}
+processFile <- function(filepath) {
+  levels_list <- list()
+  con = file(filepath, "r")
+  while (TRUE) {
+    line = readLines(con, n = 1)
+    if ( length(line) == 0 ) {
+      break
+    }
+    levels_list <- c(levels_list, line)
+  }
+  close(con)
+  
+  sapply(X = levels_list, FUN = \(x) as.numeric(strsplit(x = x, split = " ")[[1]]))
+}
+
+check_safety <- function(lvls) {
+  deltas <- diff(lvls)
+  
+  if (all(abs(deltas) >= 1 & abs(deltas) <= 3) & (all(deltas > 0) | all(deltas < 0)) )
+    return(TRUE)
+  else
+    return(FALSE)
+}
+```
+
+```{r}
+levels_list <- processFile("input")
+checks <- vector(length = length(levels_list))
+
+for (i in seq_along(checks)) {
+  checks[i] <- check_safety(levels_list[[i]])
+}
+
+sum(checks)
+```
+
+## Part 2
+
+```{r}
+check_safety_tol <- function(lvls) {
+  check_result <- check_safety(lvls)
+  for (s in seq_along(lvls)) {
+    lvls_subset <- lvls[-s]
+    check_result <- c(check_result, check_safety(lvls_subset))
+  }
+  return(any(check_result))
+}
+```
+
+```{r}
+levels_list <- processFile("input")
+checks <- vector(length = length(levels_list))
+
+for (i in seq_along(checks)) {
+  checks[i] <- check_safety_tol(levels_list[[i]])
+}
+
+sum(checks)
+```
